@@ -1,9 +1,7 @@
 extends GDShellCommand
 
 
-func _main(argv: Array, data) -> Dictionary:
-	var path: String
-
+func _main(argv: Array, _data) -> Dictionary:
 	# If additional functionality is added, this should be moved to it's own function
 	# But i think i addressed most of what an ls command could do
 	var starting_node = get_starting_node(argv)
@@ -26,10 +24,10 @@ func get_tree_dict(node: Node, root_node: Node, start := true) -> Dictionary:
 	node_dict["has_script"] = node.get_script() != null
 	node_dict["script_file"] = node.get_script().get_path() if node_dict["has_script"] else "none"
 	node_dict["type"] = node.get_class()
-	node_dict["is_instanced_scene"] = node.scene_file_path != ""
+	node_dict["is_instanced_scene"] = (node.scene_file_path != "")
 	node_dict["scene_file_path"] = str(node.scene_file_path)
 	node_dict["scene_tree_path"] = str(node.get_path())
-	node_dict["parent"] = node.get_parent().name if node.get_parent() != null else "none"
+	node_dict["parent"] = "none" if node.get_parent() == null else node.get_parent().name
 	node_dict["children"] = []
 
 	for child in node.get_children():
@@ -42,7 +40,7 @@ func get_tree_dict(node: Node, root_node: Node, start := true) -> Dictionary:
 
 
 func output_tree_dict(
-	tree_dict: Dictionary, parent := "", prefix := "", root_node := "", start := true, last := false
+	tree_dict: Dictionary, prefix := "", root_node := "", start := true, last := false
 ):
 	var new_prefix := "" if start else " ┖╴" if last else " ┠╴"
 	root_node = tree_dict["name"] if start else root_node
@@ -71,7 +69,6 @@ func output_tree_dict(
 				item,
 				item["parent"],
 				prefix + new_prefix,
-				root_node,
 				false,
 				i == num_of_siblings - 1
 			)
